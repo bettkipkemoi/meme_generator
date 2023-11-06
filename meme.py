@@ -1,55 +1,64 @@
 import streamlit as st
-from PIL import Image, ImageDraw, ImageFont
+import requests
+import openai
+import random
 
-st.set_page_config(page_title="Meme Generator", page_icon=":laughing:")
-# Function to generate a meme
-def generate_meme(image, top_text, bottom_text):
-    # Load the image
-    img = Image.open(image)
+# Set your Unsplash API key here
+UNSPLASH_API_KEY = "YOUR_UNSPLASH_API_KEY"
 
-    # Add text to the image
-    draw = ImageDraw.Draw(img)
-    width, height = img.size
+# Set your OpenAI GPT-3 API key here
+GPT3_API_KEY = "YOUR_OPENAI_API_KEY"
 
-    # Load a font for the text
-    font = ImageFont.load_default()
+# Function to generate a meme caption using GPT-3
+def generate_meme_caption(prompt):
+    openai.api_key = GPT3_API_KEY
+    response = openai.Completion.create(
+        engine="davinci",
+        prompt=prompt,
+        max_tokens=30,
+    )
+    return response.choices[0].text
 
-    # Calculate text size and position
-    text_width, text_height = draw.textsize(top_text, font)
-    x = (width - text_width) / 2
-    y = 10
-
-    # Add top text
-    draw.text((x, y), top_text, fill="white", font=font)
-
-    text_width, text_height = draw.textsize(bottom_text, font)
-    x = (width - text_width) / 2
-    y = height - text_height - 10
-
-    # Add bottom text
-    draw.text((x, y), bottom_text, fill="white", font=font)
-
-    return img
+# Function to fetch a random image from Unsplash
+def get_random_image(query):
+    headers = {
+        "Authorization": f"Client-ID {UNSPLASH_API_KEY}",
+    }
+    params = {
+        "query": query,
+        "per_page": 1,
+    }
+    response = requests.get("https://api.unsplash.com/photos/random", headers=headers, params=params)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
 
 # Streamlit UI
 st.title("Meme Generator")
 st.sidebar.title("Generate Your Meme")
 
-# Upload an image
-uploaded_image = st.file_uploader("Upload your image", type=["jpg", "png", "jpeg"])
+# Input for the meme topic
+meme_topic = st.sidebar.text_input("Meme Topic", "funny cats")
 
-# Input for top and bottom text
-top_text = st.sidebar.text_input("Top Text", "")
-bottom_text = st.sidebar.text_input("Bottom Text", "")
+# Button to generate a meme
+if st.sidebar.button("Generate Meme"):
+    # Fetch a random image
+    image_data = get_random_image(meme_topic)
+    if image_data:
+        image_url = image_data["urls"]["regular"]
+        st.image(image_url, use_container_width=True, caption="Your Random Image")
 
-# Display the meme
-if uploaded_image is not None and top_text != "" and bottom_text != "":
-    meme = generate_meme(uploaded_image, top_text, bottom_text)
-    st.image(meme, use_container_width=True, caption="Your Meme")
+        # Generate a meme caption
+        meme_caption = generate_meme_caption(f"Create a meme about {meme_topic}.")
+        st.write("Meme Caption:", meme_caption)
+    else:
+        st.warning("Unable to fetch an image. Please try again with a different topic.")
 
 # Add a footer
 st.sidebar.markdown("Created by Your Name")
 
 # Run the app
 if __name__ == '__main__':
+    st.set_page_config(page_title="Meme Generator", page_icon=":laughing:")
     st.write("Welcome to the Meme Generator!")
