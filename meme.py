@@ -6,10 +6,10 @@ import random
 st.set_page_config(page_title="Meme Generator", page_icon=":laughing:")
 
 # Set your Unsplash API key here
-UNSPLASH_API_KEY = "FgvIwR6IeJaOAX6Pnya8duvseff6Dbo6CKwI1U4uQ_I"
+UNSPLASH_API_KEY = "YOUR_API_KEY"
 
 # Set your OpenAI GPT-3 API key here
-GPT3_API_KEY = "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"
+GPT3_API_KEY = "YOUR_API_KEY"
 
 # Function to generate a meme caption using GPT-3
 def generate_meme_caption(prompt):
