@@ -3,11 +3,13 @@ import requests
 import openai
 import random
 
+st.set_page_config(page_title="Meme Generator", page_icon=":laughing:")
+
 # Set your Unsplash API key here
-UNSPLASH_API_KEY = "YOUR_UNSPLASH_API_KEY"
+UNSPLASH_API_KEY = "FgvIwR6IeJaOAX6Pnya8duvseff6Dbo6CKwI1U4uQ_I"
 
 # Set your OpenAI GPT-3 API key here
-GPT3_API_KEY = "YOUR_OPENAI_API_KEY"
+GPT3_API_KEY = "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"
 
 # Function to generate a meme caption using GPT-3
 def generate_meme_caption(prompt):
@@ -47,7 +49,7 @@ if st.sidebar.button("Generate Meme"):
     image_data = get_random_image(meme_topic)
     if image_data:
         image_url = image_data["urls"]["regular"]
-        st.image(image_url, use_container_width=True, caption="Your Random Image")
+        st.image(image_url, caption="Your Random Image")
 
         # Generate a meme caption
         meme_caption = generate_meme_caption(f"Create a meme about {meme_topic}.")
@@ -60,5 +62,4 @@ st.sidebar.markdown("Created by Your Name")
 
 # Run the app
 if __name__ == '__main__':
-    st.set_page_config(page_title="Meme Generator", page_icon=":laughing:")
     st.write("Welcome to the Meme Generator!")
